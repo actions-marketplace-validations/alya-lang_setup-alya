@@ -42,5 +42,5 @@ jobs:
       - name: Test simple Alya execution
         shell: bash
         run: |
-          echo 'fn main() { println("Hello from setup-alya CI!"); }' > hello.alya
+          echo 'say "Hello from setup-alya CI!"' > hello.alya
           alyac run hello.alya
