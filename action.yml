@@ -1,0 +1,41 @@
+name: 'Setup Alya'
+description: 'Set up the Alya programming language compiler (alyac) and add it to PATH'
+author: 'Alya Language Contributors'
+
+branding:
+  icon: 'terminal'
+  color: 'blue'
+
+inputs:
+  version:
+    description: 'Version of the Alya compiler to install (e.g. "0.0.5", "v0.0.5", or "latest")'
+    required: false
+    default: 'latest'
+  check-checksum:
+    description: 'Verify the SHA-256 checksum of the downloaded release archive'
+    required: false
+    default: 'true'
+  token:
+    description: 'GitHub token used for GitHub API requests to avoid rate limits'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  version:
+    description: 'Installed Alya compiler version'
+    value: ${{ steps.setup.outputs.version }}
+  alyac-path:
+    description: 'Directory path containing the alyac binary'
+    value: ${{ steps.setup.outputs.alyac-path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Alya Compiler
+      id: setup
+      shell: bash
+      run: python3 "${{ github.action_path }}/setup_alya.py"
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_CHECK_CHECKSUM: ${{ inputs.check-checksum }}
+        INPUT_TOKEN: ${{ inputs.token }}
