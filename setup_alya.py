@@ -90,10 +90,10 @@ def resolve_version(requested_version, token=""):
                         return tag
         except Exception as e:
             log(f"Warning: Failed to fetch releases from GitHub API: {e}")
-            log("Falling back to default stable release 'v0.0.6'")
-            return "v0.0.6"
+            log("Falling back to default stable release 'v0.0.7'")
+            return "v0.0.7"
 
-        return "v0.0.6"
+        return "v0.0.7"
 
     # Specific version given (e.g. "0.0.5" -> "v0.0.5")
     if not version_input.startswith("v"):
