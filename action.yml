@@ -8,7 +8,7 @@ branding:
 
 inputs:
   version:
-    description: 'Version of the Alya compiler to install (e.g. "0.0.10", "v0.0.11", or "latest")'
+    description: 'Version of the Alya compiler to install (e.g. "0.0.11", "v0.0.12", or "latest")'
     required: false
     default: 'latest'
   check-checksum:
