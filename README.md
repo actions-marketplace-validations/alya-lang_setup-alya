@@ -32,10 +32,10 @@ steps:
 ### 1. Pin a Specific Version
 
 ```yaml
-- name: Set up Alya v0.0.15
+- name: Set up Alya v0.0.16
   uses: alya-lang/setup-alya@v1
   with:
-    version: '0.0.15'
+    version: '0.0.16'
 ```
 
 ### 2. Multi-OS Matrix (Linux, Windows, macOS)
