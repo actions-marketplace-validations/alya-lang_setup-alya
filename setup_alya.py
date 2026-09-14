@@ -126,6 +126,7 @@ def main():
     requested_version = os.environ.get("INPUT_VERSION", "latest")
     check_checksum = os.environ.get("INPUT_CHECK_CHECKSUM", "true").lower() in ("true", "1", "yes")
     token = os.environ.get("INPUT_TOKEN", "").strip()
+    toolchain_enabled = os.environ.get("INPUT_TOOLCHAIN", "true").lower() in ("true", "1", "yes")
 
     try:
         platform_id, ext, bin_name = detect_target()
@@ -236,6 +237,30 @@ def main():
     except Exception as e:
         log_error(f"Failed to execute '{bin_path} --version': {e}")
         sys.exit(1)
+
+    # Configure zero-setup toolchain environment and pre-warm if requested
+    if toolchain_enabled:
+        github_env = os.environ.get("GITHUB_ENV", "")
+        if github_env:
+            with open(github_env, "a", encoding="utf-8") as f:
+                f.write("ALYA_TOOLCHAIN_AUTO_INSTALL=1\n")
+            log("Configured ALYA_TOOLCHAIN_AUTO_INSTALL=1 in GITHUB_ENV")
+        else:
+            os.environ["ALYA_TOOLCHAIN_AUTO_INSTALL"] = "1"
+
+        # Pre-warm toolchain on Windows runners if supported by alyac (v0.0.16+)
+        if sys.platform == "win32":
+            try:
+                res = subprocess.run(
+                    [str(bin_path), "toolchain", "install"],
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                )
+                if res.returncode == 0:
+                    log("Windows minimal toolchain pre-installed successfully.")
+            except Exception:
+                pass
 
 
 if __name__ == "__main__":

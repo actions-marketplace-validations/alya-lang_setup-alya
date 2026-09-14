@@ -89,6 +89,7 @@ jobs:
 | `version` | Target Alya compiler version (e.g. `'0.0.5'`, `'v0.0.5'`, or `'latest'`) | No | `'latest'` |
 | `check-checksum` | Verify SHA-256 checksum of the downloaded release archive | No | `'true'` |
 | `token` | GitHub token used for API requests (to avoid rate limits) | No | `${{ github.token }}` |
+| `toolchain` | Ensure zero-setup toolchain readiness and export `ALYA_TOOLCHAIN_AUTO_INSTALL=1` | No | `'true'` |
 
 ---
 
