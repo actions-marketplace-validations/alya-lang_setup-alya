@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        version: ['latest', '0.0.8']
+        version: ['latest', '0.0.16']
 
     steps:
       - name: Checkout repository
