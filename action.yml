@@ -1,5 +1,5 @@
 name: 'Setup Alya'
-description: 'Set up the Alya programming language compiler (alyac) and add it to PATH'
+description: 'Set up the Alya programming language compiler and add it to PATH'
 author: 'Alya Language Contributors'
 
 branding:
@@ -28,9 +28,9 @@ outputs:
   version:
     description: 'Installed Alya compiler version'
     value: ${{ steps.setup.outputs.version }}
-  alyac-path:
-    description: 'Directory path containing the alyac binary'
-    value: ${{ steps.setup.outputs.alyac-path }}
+  alya-path:
+    description: 'Directory path containing the alya binary'
+    value: ${{ steps.setup.outputs.alya-path }}
 
 runs:
   using: 'composite'

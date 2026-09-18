@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/github/license/alya-lang/setup-alya?color=blue&label=License)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/alya-lang/alya?include_prereleases&label=Alya&color=orange)](https://github.com/alya-lang/alya/releases)
 
-Set up your GitHub Actions workflow with the [Alya](https://github.com/alya-lang/alya) programming language compiler (`alyac`) and add it to `PATH`.
+Set up your GitHub Actions workflow with the [Alya](https://github.com/alya-lang/alya) programming language compiler and add it to `PATH`.
 
 ---
 
@@ -22,7 +22,7 @@ steps:
       version: 'latest'
 
   - name: Run Alya tests
-    run: alyac run tests/test_basic.alya
+    run: alya run tests/test_basic.alya
 ```
 
 ---
@@ -58,11 +58,11 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Verify alyac
-        run: alyac --version
+      - name: Verify alya
+        run: alya --version
 
       - name: Run test suite
-        run: alyac run tests/test_basic.alya
+        run: alya run tests/test_basic.alya
 ```
 
 ### 3. Using Action Outputs
@@ -77,7 +77,7 @@ jobs:
 - name: Print resolved compiler info
   run: |
     echo "Installed version: ${{ steps.alya.outputs.version }}"
-    echo "Binary directory:  ${{ steps.alya.outputs.alyac-path }}"
+    echo "Binary directory:  ${{ steps.alya.outputs.alya-path }}"
 ```
 
 ---
@@ -98,7 +98,7 @@ jobs:
 | Output | Description | Example |
 |:---|:---|:---|
 | `version` | The resolved Alya compiler version | `0.0.18` |
-| `alyac-path` | Directory path containing the `alyac` binary | `/home/runner/.alyac/0.0.18/x86_64-linux` |
+| `alya-path` | Directory path containing the `alya` binary | `/home/runner/.alya/0.0.18/x86_64-linux` |
 
 ---
 
@@ -108,10 +108,10 @@ Pre-built binaries are downloaded directly from official [Alya Releases](https:/
 
 | Operating System | Architecture | Archive Format | Binary |
 |:---|:---|:---|:---|
-| **Linux** | `x86_64` | `.tar.gz` | `alyac` |
-| **macOS** | `arm64` (Apple Silicon) | `.tar.gz` | `alyac` |
-| **macOS** | `x86_64` (Intel) | `.tar.gz` | `alyac` |
-| **Windows** | `x86_64` | `.zip` | `alyac.exe` |
+| **Linux** | `x86_64` | `.tar.gz` | `alya` |
+| **macOS** | `arm64` (Apple Silicon) | `.tar.gz` | `alya` |
+| **macOS** | `x86_64` (Intel) | `.tar.gz` | `alya` |
+| **Windows** | `x86_64` | `.zip` | `alya.exe` |
 
 ---
 

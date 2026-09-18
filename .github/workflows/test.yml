@@ -27,20 +27,20 @@ jobs:
         with:
           version: ${{ matrix.version }}
 
-      - name: Verify alyac executable on PATH
+      - name: Verify alya executable on PATH
         run: |
-          alyac --version
+          alya --version
 
       - name: Check action outputs
         shell: bash
         run: |
           echo "Output version: ${{ steps.alya.outputs.version }}"
-          echo "Output path:    ${{ steps.alya.outputs.alyac-path }}"
+          echo "Output path:    ${{ steps.alya.outputs.alya-path }}"
           test -n "${{ steps.alya.outputs.version }}"
-          test -n "${{ steps.alya.outputs.alyac-path }}"
+          test -n "${{ steps.alya.outputs.alya-path }}"
 
       - name: Test simple Alya execution
         shell: bash
         run: |
           echo 'say "Hello from setup-alya CI!"' > hello.alya
-          alyac run hello.alya
+          alya run hello.alya

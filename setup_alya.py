@@ -3,7 +3,7 @@
 setup_alya.py
 Core installer for the alya-lang/setup-alya GitHub Action.
 
-Downloads, verifies, extracts, and configures the Alya compiler (alyac)
+Downloads, verifies, extracts, and configures the Alya compiler
 for Linux, macOS, and Windows runners.
 """
 
@@ -45,7 +45,7 @@ def detect_target():
         arch = "x86_64"
         platform_id = "x86_64-linux"
         ext = "tar.gz"
-        bin_name = "alyac"
+        bin_name = "alya"
     elif sys_plat == "darwin":
         # macOS releases: arm64-macos or x86_64-macos
         if mach in ("arm64", "aarch64"):
@@ -55,13 +55,13 @@ def detect_target():
             arch = "x86_64"
             platform_id = "x86_64-macos"
         ext = "tar.gz"
-        bin_name = "alyac"
+        bin_name = "alya"
     elif sys_plat == "win32":
         # Windows releases: x86_64-windows
         arch = "x86_64"
         platform_id = "x86_64-windows"
         ext = "zip"
-        bin_name = "alyac.exe"
+        bin_name = "alya.exe"
     else:
         raise RuntimeError(f"Unsupported operating system: {sys_plat} ({mach})")
 
@@ -136,15 +136,15 @@ def main():
 
     tag = resolve_version(requested_version, token)
     clean_version = tag.lstrip("v")
-    package_name = f"alyac-{tag}-{platform_id}"
+    package_name = f"alya-{tag}-{platform_id}"
     archive_name = f"{package_name}.{ext}"
 
     # Determine installation / cache directory
     tool_cache = os.environ.get("RUNNER_TOOL_CACHE", "")
     if tool_cache and Path(tool_cache).is_dir():
-        install_root = Path(tool_cache) / "alyac" / clean_version / platform_id
+        install_root = Path(tool_cache) / "alya" / clean_version / platform_id
     else:
-        install_root = Path.home() / ".alyac" / clean_version / platform_id
+        install_root = Path.home() / ".alya" / clean_version / platform_id
 
     install_root.mkdir(parents=True, exist_ok=True)
 
@@ -228,7 +228,7 @@ def main():
     if github_output:
         with open(github_output, "a", encoding="utf-8") as f:
             f.write(f"version={clean_version}\n")
-            f.write(f"alyac-path={bin_dir}\n")
+            f.write(f"alya-path={bin_dir}\n")
 
     # Verify installation
     try:
@@ -248,7 +248,7 @@ def main():
         else:
             os.environ["ALYA_TOOLCHAIN_AUTO_INSTALL"] = "1"
 
-        # Pre-warm toolchain on Windows runners if supported by alyac (v0.0.16+)
+        # Pre-warm toolchain on Windows runners if supported by alya (v0.0.16+)
         if sys.platform == "win32":
             try:
                 res = subprocess.run(
