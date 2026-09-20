@@ -32,10 +32,10 @@ steps:
 ### 1. Pin a Specific Version
 
 ```yaml
-- name: Set up Alya v0.0.18
+- name: Set up Alya v0.0.19
   uses: alya-lang/setup-alya@v1
   with:
-    version: '0.0.18'
+    version: '0.0.19'
 ```
 
 ### 2. Multi-OS Matrix (Linux, Windows, macOS)
@@ -97,8 +97,8 @@ jobs:
 
 | Output | Description | Example |
 |:---|:---|:---|
-| `version` | The resolved Alya compiler version | `0.0.18` |
-| `alya-path` | Directory path containing the `alya` binary | `/home/runner/.alya/0.0.18/x86_64-linux` |
+| `version` | The resolved Alya compiler version | `0.0.19` |
+| `alya-path` | Directory path containing the `alya` binary | `/home/runner/.alya/0.0.19/x86_64-linux` |
 
 ---
 
