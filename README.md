@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-latest, macos-15-intel]
 
     steps:
       - uses: actions/checkout@v4
@@ -109,11 +109,11 @@ Pre-built binaries are downloaded directly from official [Alya Releases](https:/
 | Operating System | Architecture | Archive Format | Binary | Available Since |
 |:---|:---|:---|:---|:---|
 | **Linux** | `x86_64` | `.tar.gz` | `alya` | all releases |
-| **Linux** | `arm64` (AArch64) | `.tar.gz` | `alya` | post-`v0.0.19` releases |
+| **Linux** | `arm64` (AArch64) | `.tar.gz` | `alya` | `v0.0.19` and later |
 | **macOS** | `arm64` (Apple Silicon) | `.tar.gz` | `alya` | all releases |
 | **macOS** | `x86_64` (Intel) | `.tar.gz` | `alya` | all releases |
 | **Windows** | `x86_64` | `.zip` | `alya.exe` | all releases |
-| **Windows** | `arm64` (AArch64) | `.zip` | `alya.exe` | post-`v0.0.19` releases |
+| **Windows** | `arm64` (AArch64) | `.zip` | `alya.exe` | `v0.0.19` and later |
 
 ---
 
