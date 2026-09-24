@@ -41,9 +41,13 @@ def detect_target():
     mach = platform.machine().lower()
 
     if sys_plat.startswith("linux"):
-        # Linux releases: x86_64-linux
-        arch = "x86_64"
-        platform_id = "x86_64-linux"
+        # Linux releases: x86_64-linux or arm64-linux
+        if mach in ("arm64", "aarch64"):
+            arch = "arm64"
+            platform_id = "arm64-linux"
+        else:
+            arch = "x86_64"
+            platform_id = "x86_64-linux"
         ext = "tar.gz"
         bin_name = "alya"
     elif sys_plat == "darwin":
@@ -57,9 +61,13 @@ def detect_target():
         ext = "tar.gz"
         bin_name = "alya"
     elif sys_plat == "win32":
-        # Windows releases: x86_64-windows
-        arch = "x86_64"
-        platform_id = "x86_64-windows"
+        # Windows releases: x86_64-windows or arm64-windows
+        if mach in ("arm64", "aarch64"):
+            arch = "arm64"
+            platform_id = "arm64-windows"
+        else:
+            arch = "x86_64"
+            platform_id = "x86_64-windows"
         ext = "zip"
         bin_name = "alya.exe"
     else:
