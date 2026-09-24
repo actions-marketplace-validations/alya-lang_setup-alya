@@ -106,14 +106,15 @@ jobs:
 
 Pre-built binaries are downloaded directly from official [Alya Releases](https://github.com/alya-lang/alya/releases):
 
-| Operating System | Architecture | Archive Format | Binary |
-|:---|:---|:---|:---|
-| **Linux** | `x86_64` | `.tar.gz` | `alya` |
-| **Linux** | `arm64` (AArch64) | `.tar.gz` | `alya` |
-| **macOS** | `arm64` (Apple Silicon) | `.tar.gz` | `alya` |
-| **macOS** | `x86_64` (Intel) | `.tar.gz` | `alya` |
-| **Windows** | `x86_64` | `.zip` | `alya.exe` |
-| **Windows** | `arm64` (AArch64) | `.zip` | `alya.exe` |
+| Operating System | Architecture | Archive Format | Binary | Available Since |
+|:---|:---|:---|:---|:---|
+| **Linux** | `x86_64` | `.tar.gz` | `alya` | all releases |
+| **Linux** | `arm64` (AArch64) | `.tar.gz` | `alya` | post-`v0.0.19` releases |
+| **macOS** | `arm64` (Apple Silicon) | `.tar.gz` | `alya` | all releases |
+| **macOS** | `x86_64` (Intel) | `.tar.gz` | `alya` | all releases |
+| **Windows** | `x86_64` | `.zip` | `alya.exe` | all releases |
+| **Windows** | `arm64` (AArch64) | `.zip` | `alya.exe` | post-`v0.0.19` releases |
+| **Windows** | `x86` (32-bit) | `.zip` | `alya.exe` | post-`v0.0.19` releases |
 
 ---
 

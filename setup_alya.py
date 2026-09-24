@@ -61,10 +61,13 @@ def detect_target():
         ext = "tar.gz"
         bin_name = "alya"
     elif sys_plat == "win32":
-        # Windows releases: x86_64-windows or arm64-windows
+        # Windows releases: x86_64-windows, arm64-windows or x86-windows
         if mach in ("arm64", "aarch64"):
             arch = "arm64"
             platform_id = "arm64-windows"
+        elif mach in ("x86", "i386", "i686"):
+            arch = "x86"
+            platform_id = "x86-windows"
         else:
             arch = "x86_64"
             platform_id = "x86_64-windows"
