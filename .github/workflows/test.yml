@@ -9,13 +9,22 @@ on:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }} (${{ matrix.version }})
+    name: Test (${{ matrix.label }}, ${{ matrix.version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
         version: ['latest', '0.0.19']
+        include:
+          - os: ubuntu-latest
+            label: Linux x64
+          - os: windows-latest
+            label: Windows x64
+          - os: macos-latest
+            label: macOS ARM64
+          - os: macos-15-intel
+            label: macOS Intel
 
     steps:
       - name: Checkout repository
@@ -46,14 +55,18 @@ jobs:
           alya run hello.alya
 
   test-arm:
-    name: Test on ${{ matrix.os }} (latest)
+    name: Test (${{ matrix.label }}, ${{ matrix.version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        # ARM binaries ship with post-0.0.19 releases, so only 'latest' is tested here
         os: [ubuntu-24.04-arm, windows-11-arm]
-        version: ['latest']
+        version: ['latest', '0.0.19']
+        include:
+          - os: ubuntu-24.04-arm
+            label: Linux ARM64
+          - os: windows-11-arm
+            label: Windows ARM64
 
     steps:
       - name: Checkout repository
