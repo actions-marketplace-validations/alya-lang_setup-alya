@@ -44,3 +44,33 @@ jobs:
         run: |
           echo 'say "Hello from setup-alya CI!"' > hello.alya
           alya run hello.alya
+
+  test-arm:
+    name: Test on ${{ matrix.os }} (latest)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # ARM binaries ship with post-0.0.19 releases, so only 'latest' is tested here
+        os: [ubuntu-24.04-arm, windows-11-arm]
+        version: ['latest']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Alya Compiler (${{ matrix.version }})
+        id: alya
+        uses: ./
+        with:
+          version: ${{ matrix.version }}
+
+      - name: Verify alya executable on PATH
+        run: |
+          alya --version
+
+      - name: Test simple Alya execution
+        shell: bash
+        run: |
+          echo 'say "Hello from setup-alya ARM CI!"' > hello.alya
+          alya run hello.alya

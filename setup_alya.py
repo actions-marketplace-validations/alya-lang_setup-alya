@@ -109,6 +109,19 @@ def resolve_version(requested_version, token=""):
     return version_input
 
 
+def list_release_assets(tag, token=""):
+    """List asset filenames for an Alya release tag via GitHub API."""
+    url = f"https://api.github.com/repos/alya-lang/alya/releases/tags/{tag}"
+    headers = {"User-Agent": "alya-lang-setup-alya", "Accept": "application/vnd.github+json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+    return [a.get("name", "") for a in data.get("assets", []) if a.get("name")]
+
+
 def download_file(url, dest_path, token=""):
     """Download a remote URL to dest_path with optional GitHub authentication."""
     headers = {"User-Agent": "alya-lang-setup-alya"}
@@ -146,6 +159,23 @@ def main():
     clean_version = tag.lstrip("v")
     package_name = f"alya-{tag}-{platform_id}"
     archive_name = f"{package_name}.{ext}"
+
+    # Cross-check against published release assets (single source of truth for
+    # supported platforms). Unreachable API falls back to the conventional
+    # name; a reachable API with no match fails fast with a clear message
+    # (e.g. arm64 requested from a release that predates ARM binaries).
+    try:
+        asset_names = list_release_assets(tag, token)
+    except Exception as e:
+        log(f"Warning: Could not list release assets ({e}). Proceeding with conventional name...")
+        asset_names = None
+    if asset_names is not None and archive_name not in asset_names:
+        available = ", ".join(sorted(asset_names)) if asset_names else "(none)"
+        log_error(
+            f"Release {tag} has no asset '{archive_name}' for this runner. "
+            f"Available assets: {available}"
+        )
+        sys.exit(1)
 
     # Determine installation / cache directory
     tool_cache = os.environ.get("RUNNER_TOOL_CACHE", "")
