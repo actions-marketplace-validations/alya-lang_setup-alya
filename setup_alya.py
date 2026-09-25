@@ -3,7 +3,7 @@
 setup_alya.py
 Core installer for the alya-lang/setup-alya GitHub Action.
 
-Downloads, verifies, extracts, and configures the Alya compiler (alyac)
+Downloads, verifies, extracts, and configures the Alya compiler
 for Linux, macOS, and Windows runners.
 """
 
@@ -41,11 +41,15 @@ def detect_target():
     mach = platform.machine().lower()
 
     if sys_plat.startswith("linux"):
-        # Linux releases: x86_64-linux
-        arch = "x86_64"
-        platform_id = "x86_64-linux"
+        # Linux releases: x86_64-linux or arm64-linux
+        if mach in ("arm64", "aarch64"):
+            arch = "arm64"
+            platform_id = "arm64-linux"
+        else:
+            arch = "x86_64"
+            platform_id = "x86_64-linux"
         ext = "tar.gz"
-        bin_name = "alyac"
+        bin_name = "alya"
     elif sys_plat == "darwin":
         # macOS releases: arm64-macos or x86_64-macos
         if mach in ("arm64", "aarch64"):
@@ -55,13 +59,17 @@ def detect_target():
             arch = "x86_64"
             platform_id = "x86_64-macos"
         ext = "tar.gz"
-        bin_name = "alyac"
+        bin_name = "alya"
     elif sys_plat == "win32":
-        # Windows releases: x86_64-windows
-        arch = "x86_64"
-        platform_id = "x86_64-windows"
+        # Windows releases: x86_64-windows or arm64-windows
+        if mach in ("arm64", "aarch64"):
+            arch = "arm64"
+            platform_id = "arm64-windows"
+        else:
+            arch = "x86_64"
+            platform_id = "x86_64-windows"
         ext = "zip"
-        bin_name = "alyac.exe"
+        bin_name = "alya.exe"
     else:
         raise RuntimeError(f"Unsupported operating system: {sys_plat} ({mach})")
 
@@ -90,15 +98,28 @@ def resolve_version(requested_version, token=""):
                         return tag
         except Exception as e:
             log(f"Warning: Failed to fetch releases from GitHub API: {e}")
-            log("Falling back to default stable release 'v0.0.7'")
-            return "v0.0.7"
+            log("Falling back to default stable release 'v0.0.19'")
+            return "v0.0.19"
 
-        return "v0.0.7"
+        return "v0.0.19"
 
     # Specific version given (e.g. "0.0.5" -> "v0.0.5")
     if not version_input.startswith("v"):
         return f"v{version_input}"
     return version_input
+
+
+def list_release_assets(tag, token=""):
+    """List asset filenames for an Alya release tag via GitHub API."""
+    url = f"https://api.github.com/repos/alya-lang/alya/releases/tags/{tag}"
+    headers = {"User-Agent": "alya-lang-setup-alya", "Accept": "application/vnd.github+json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+    return [a.get("name", "") for a in data.get("assets", []) if a.get("name")]
 
 
 def download_file(url, dest_path, token=""):
@@ -126,6 +147,7 @@ def main():
     requested_version = os.environ.get("INPUT_VERSION", "latest")
     check_checksum = os.environ.get("INPUT_CHECK_CHECKSUM", "true").lower() in ("true", "1", "yes")
     token = os.environ.get("INPUT_TOKEN", "").strip()
+    toolchain_enabled = os.environ.get("INPUT_TOOLCHAIN", "true").lower() in ("true", "1", "yes")
 
     try:
         platform_id, ext, bin_name = detect_target()
@@ -135,15 +157,32 @@ def main():
 
     tag = resolve_version(requested_version, token)
     clean_version = tag.lstrip("v")
-    package_name = f"alyac-{tag}-{platform_id}"
+    package_name = f"alya-{tag}-{platform_id}"
     archive_name = f"{package_name}.{ext}"
+
+    # Cross-check against published release assets (single source of truth for
+    # supported platforms). Unreachable API falls back to the conventional
+    # name; a reachable API with no match fails fast with a clear message
+    # (e.g. arm64 requested from a release that predates ARM binaries).
+    try:
+        asset_names = list_release_assets(tag, token)
+    except Exception as e:
+        log(f"Warning: Could not list release assets ({e}). Proceeding with conventional name...")
+        asset_names = None
+    if asset_names is not None and archive_name not in asset_names:
+        available = ", ".join(sorted(asset_names)) if asset_names else "(none)"
+        log_error(
+            f"Release {tag} has no asset '{archive_name}' for this runner. "
+            f"Available assets: {available}"
+        )
+        sys.exit(1)
 
     # Determine installation / cache directory
     tool_cache = os.environ.get("RUNNER_TOOL_CACHE", "")
     if tool_cache and Path(tool_cache).is_dir():
-        install_root = Path(tool_cache) / "alyac" / clean_version / platform_id
+        install_root = Path(tool_cache) / "alya" / clean_version / platform_id
     else:
-        install_root = Path.home() / ".alyac" / clean_version / platform_id
+        install_root = Path.home() / ".alya" / clean_version / platform_id
 
     install_root.mkdir(parents=True, exist_ok=True)
 
@@ -227,7 +266,7 @@ def main():
     if github_output:
         with open(github_output, "a", encoding="utf-8") as f:
             f.write(f"version={clean_version}\n")
-            f.write(f"alyac-path={bin_dir}\n")
+            f.write(f"alya-path={bin_dir}\n")
 
     # Verify installation
     try:
@@ -236,6 +275,30 @@ def main():
     except Exception as e:
         log_error(f"Failed to execute '{bin_path} --version': {e}")
         sys.exit(1)
+
+    # Configure zero-setup toolchain environment and pre-warm if requested
+    if toolchain_enabled:
+        github_env = os.environ.get("GITHUB_ENV", "")
+        if github_env:
+            with open(github_env, "a", encoding="utf-8") as f:
+                f.write("ALYA_TOOLCHAIN_AUTO_INSTALL=1\n")
+            log("Configured ALYA_TOOLCHAIN_AUTO_INSTALL=1 in GITHUB_ENV")
+        else:
+            os.environ["ALYA_TOOLCHAIN_AUTO_INSTALL"] = "1"
+
+        # Pre-warm toolchain on Windows runners if supported by alya (v0.0.16+)
+        if sys.platform == "win32":
+            try:
+                res = subprocess.run(
+                    [str(bin_path), "toolchain", "install"],
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                )
+                if res.returncode == 0:
+                    log("Windows minimal toolchain pre-installed successfully.")
+            except Exception:
+                pass
 
 
 if __name__ == "__main__":

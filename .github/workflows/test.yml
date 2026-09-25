@@ -9,13 +9,22 @@ on:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }} (${{ matrix.version }})
+    name: Test (${{ matrix.label }}, ${{ matrix.version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        version: ['latest', '0.0.7']
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
+        version: ['latest', '0.0.19']
+        include:
+          - os: ubuntu-latest
+            label: Linux x64
+          - os: windows-latest
+            label: Windows x64
+          - os: macos-latest
+            label: macOS ARM64
+          - os: macos-15-intel
+            label: macOS Intel
 
     steps:
       - name: Checkout repository
@@ -27,20 +36,54 @@ jobs:
         with:
           version: ${{ matrix.version }}
 
-      - name: Verify alyac executable on PATH
+      - name: Verify alya executable on PATH
         run: |
-          alyac --version
+          alya --version
 
       - name: Check action outputs
         shell: bash
         run: |
           echo "Output version: ${{ steps.alya.outputs.version }}"
-          echo "Output path:    ${{ steps.alya.outputs.alyac-path }}"
+          echo "Output path:    ${{ steps.alya.outputs.alya-path }}"
           test -n "${{ steps.alya.outputs.version }}"
-          test -n "${{ steps.alya.outputs.alyac-path }}"
+          test -n "${{ steps.alya.outputs.alya-path }}"
 
       - name: Test simple Alya execution
         shell: bash
         run: |
           echo 'say "Hello from setup-alya CI!"' > hello.alya
-          alyac run hello.alya
+          alya run hello.alya
+
+  test-arm:
+    name: Test (${{ matrix.label }}, ${{ matrix.version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04-arm, windows-11-arm]
+        version: ['latest', '0.0.19']
+        include:
+          - os: ubuntu-24.04-arm
+            label: Linux ARM64
+          - os: windows-11-arm
+            label: Windows ARM64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Alya Compiler (${{ matrix.version }})
+        id: alya
+        uses: ./
+        with:
+          version: ${{ matrix.version }}
+
+      - name: Verify alya executable on PATH
+        run: |
+          alya --version
+
+      - name: Test simple Alya execution
+        shell: bash
+        run: |
+          echo 'say "Hello from setup-alya ARM CI!"' > hello.alya
+          alya run hello.alya
